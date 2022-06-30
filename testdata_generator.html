@@ -1,0 +1,55 @@
+<script type="text/javascript">
+function generate() {
+	var lines = document.getElementById("excel").value.split("\n");
+	var liner = "";
+	var start = false;
+	var bigresult = "";
+	for (var l = 0; l < lines.length; l++) {
+		var tab = lines[l].split("\t");
+		if (tab[0].indexOf("(") != -1) {
+			start = true;
+		}
+		if (start) {
+			liner += lines[l] + ("\n");
+			if (tab.length < 2 || tab[0] == "") {
+				start = false;
+				bigresult += block_do(liner.split("\n")) + "\n";
+				liner = "";
+			}
+		}
+	}
+	document.getElementById("res").innerText = bigresult;
+	navigator.clipboard.writeText(bigresult);
+	alert("コピーしました");
+}
+
+function block_do (line) {
+	console.log(line);
+	var result = "";
+	for (var n = 1; n <= 3; n++) {
+	result += "INSERT INTO " + line[0].substring(0, line[0].indexOf("(")) + " VALUES(";
+	for (var i = 2; i < line.length; i++) {
+			var temp = line[i].split("\t");
+			if (temp.length < 2 || temp[0] == "") continue;
+			if (i > 2) result += ",";
+			if (temp[1].toUpperCase().indexOf("INTEGER") != -1) {
+				result += n;
+			}
+			if (temp[1].toUpperCase().indexOf("VARCHAR") != -1) {
+				result += "'" + temp[3] + n + "'";
+			}
+			if (temp[1].toUpperCase().indexOf("DATE") != -1) {
+				result += "CURDATE()";
+			}
+			if (temp[1].toUpperCase().indexOf("BIT") != -1) {
+				result += "false";
+			}
+		}
+		result += ");\n";
+	}
+	return result;
+}
+</script>
+<textarea id="excel" cols="75" rows="30"></textarea>
+<input type="button" onclick="generate()" value="生成">
+<div id="res"></div>

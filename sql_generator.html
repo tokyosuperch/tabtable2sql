@@ -1,0 +1,21 @@
+<script type="text/javascript">
+function generate() {
+	var line = document.getElementById("excel").value.split("\n");
+	var result = "";
+	result += "CREATE TABLE " + line[0].substring(0, line[0].indexOf("(")) + "(\n";
+	for (var i = 2; i < line.length; i++) {
+		var temp = line[i].split("\t");
+		if (temp.length < 2 || temp[0] == "") continue;
+		if (i > 2) result += ",\n";
+		result += temp[0] + " " + temp[1];
+		if (temp[2] != undefined && temp[2] != "") result += " " + temp[2];
+	}
+	result += "\n);";
+	document.getElementById("res").innerText = result;
+	navigator.clipboard.writeText(result);
+	alert("コピーしました");
+}
+</script>
+<textarea id="excel" cols="75" rows="30"></textarea>
+<input type="button" onclick="generate()" value="生成">
+<div id="res"></div>
